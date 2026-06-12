@@ -1,0 +1,11 @@
+# Mengunci file koneksi database yang berisi password asli
+config.php
+db_config.php
+hash.php
+
+# Mengunci folder tempat upload foto (biar foto test lo gak ikut ke-push)
+uploads/
+
+# Mengunci log error Apache/PHP jika ada
+*.log
+.DS_Store
