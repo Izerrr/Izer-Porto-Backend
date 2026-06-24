@@ -13,7 +13,7 @@ if ($conn->connect_error) {
     die(json_encode(["error" => "Koneksi Database Gagal"]));
 }
 
-$sql = "SELECT * FROM experience ORDER BY id DESC"; // Ambil yang terbaru dulu
+$sql = "SELECT * FROM experience ORDER BY id ASC"; // Ambil yang terbaru dulu
 $result = $conn->query($sql);
 
 $exp = [];
