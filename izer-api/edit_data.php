@@ -1,11 +1,8 @@
 <?php
+
+// 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
 require_once 'cors.php';
 require_once 'check_auth.php'; 
-// 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, X-Admin-Token"); 
-header("Access-Control-Allow-Methods: POST, OPTIONS, PUT");
-header("Content-Type: application/json");
 
 // 2. KUNCI UTAMA: Langsung loloskan request OPTIONS tanpa perlu cek token
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
