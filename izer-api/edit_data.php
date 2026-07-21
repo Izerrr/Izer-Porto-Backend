@@ -1,4 +1,6 @@
 <?php
+require_once 'cors.php';
+require_once 'check_auth.php'; 
 // 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Admin-Token"); 
