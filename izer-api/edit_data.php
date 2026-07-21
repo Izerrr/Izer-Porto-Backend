@@ -1,8 +1,9 @@
 <?php
 
 // 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
-require_once 'cors.php';
-require_once 'check_auth.php'; 
+require_once 'cors.php';       // 1. Beresin CORS & preflight OPTIONS
+require_once 'auth_check.php'; // 2. Kunci pintu pake HttpOnly Cookie / Token
+include_once 'db_config.php';  // 3. Koneksi DB (sudah dipanggil juga di auth_check)
 
 // 2. KUNCI UTAMA: Langsung loloskan request OPTIONS tanpa perlu cek token
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
