@@ -1,27 +1,7 @@
 <?php
 // CORS & Security Headers
-$allowed_origins = [
-    "http://localhost:3000",
-    "https://izerworks.my.id"
-];
-
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowed_origins)) {
-    header("Access-Control-Allow-Origin: " . $origin);
-}
-
-header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Headers: Content-Type, X-Admin-Token");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Content-Type: application/json");
-
-// Handle preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit(0);
-}
-
-include 'db_config.php';
+require_once 'cors.php'; // Replaces inline headers
+include_once 'db_config.php';
 
 // Rate Limiting (5 attempts / 15 mins)
 $client_ip = $_SERVER['REMOTE_ADDR'];
