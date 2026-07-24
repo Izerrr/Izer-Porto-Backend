@@ -9,10 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0); 
 }
 
-// Seek connection + Security Authentication
-include 'db_config.php'; 
-include 'check_auth.php';
-
 $input = file_get_contents("php://input");
 $data = json_decode($input, true);
 
