@@ -1,47 +1,46 @@
 <?php
 require_once 'cors.php';
-include 'db_config.php';
-
+include_once 'db_config.php';
 
 $category = $_GET['category'] ?? 'works';
 
-// 1. MAPPING TABEL & QUERY SPESIFIK
+// Table mapping based on category
 $sql = "";
 
 if ($category === 'about') {
-    // Di tabel about_content cuma ada 'id' dan 'content'.
-    // Kita alias-kan 'content' menjadi 'description' untuk textarea di frontend.
-    // Kita buat judul statis (atau bisa ambil sedikit cuplikan konten) sebagai 'title' agar list di React tidak kosong.
+    // The 'about_content' table only contains 'id' and 'content'.
+    // Alias 'content' to 'description' for the frontend textarea.
+    // Generate a static title so the list item in React is not empty.
     $sql = "SELECT id, CONCAT('About Content #', id) AS title, content AS description FROM about_content ORDER BY id DESC";
 } 
 elseif ($category === 'about_images') {
     $sql = "SELECT id, image_url FROM about_images ORDER BY id DESC";
 }
 elseif ($category === 'experience') {
-    // Struktur: id, title, date_range, description
-    // Sudah pas. Kita ambil semuanya. Frontend akan pakai 'title' dan 'description'.
+    // Structure: id, title, date_range, description
+    // Retrieve all fields; Frontend will consume 'title' and 'description'.
     $sql = "SELECT id, title, date_range, description FROM experience ORDER BY id DESC";
 } 
 elseif ($category === 'education') {
     $sql = "SELECT id, title, date_range, description FROM education ORDER BY id DESC";
 }
 elseif ($category === 'skills') {
-    // Struktur: id, skill_name, skill_number, description
-    // Alias-kan 'skill_name' menjadi 'title'. 
-    // Karena tabel sudah punya kolom 'description', ambil langsung tanpa perlu alias dari skill_number.
+    // Structure: id, skill_name, skill_number, description
+    // Alias 'skill_name' to 'title' for frontend consistency.
+    // Fetch 'description' directly as the column already exists in the table.
     $sql = "SELECT id, skill_name AS title, skill_number, description FROM skills ORDER BY skill_number ASC";
 } 
 elseif ($category === 'tech_icons') {
-    // Kita alias-kan name jadi title biar sinkron dengan list kanan di Admin Next.js
+    // Alias 'name' to 'title' to synchronize with the Next.js Admin sidebar list
     $sql = "SELECT id, name AS title, image_url FROM tech_icons ORDER BY id ASC";
 }
 elseif ($category === 'works') {
-    // Struktur: id, title, category, image_url, project_url, video_url
-    // Query ini sudah aman. Bisa pakai SELECT * atau dijabarkan seperti di bawah.
+    // Structure: id, title, category, image_url, project_url, video_url
+    // Explicit selection of required columns for query safety and performance.
     $sql = "SELECT id, title, category, image_url, project_url, video_url FROM projects ORDER BY id DESC";
 }
 
-// 2. EKSEKUSI
+// Execute the query and fetch results
 if ($sql !== "") {
     $result = $conn->query($sql);
     $data = [];
@@ -53,6 +52,6 @@ if ($sql !== "") {
     }
     echo json_encode($data);
 } else {
-    echo json_encode(["error" => "Kategori gak jelas, Zi!"]);
+    echo json_encode(["error" => "Invalid category requested!"]);
 }
 ?>

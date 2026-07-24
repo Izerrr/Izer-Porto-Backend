@@ -64,10 +64,10 @@ if ($data) {
             setcookie('admin_token', $token, [
                 'expires'  => time() + 86400,
                 'path'     => '/',
-                'domain'   => '',
+                'domain'   => '.izerworks.my.id',
                 'secure'   => $is_https,
                 'httponly' => true,
-                'samesite' => 'Strict'
+                'samesite' => 'Lax'
             ]);
 
             echo json_encode([

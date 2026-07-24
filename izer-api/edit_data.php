@@ -1,17 +1,17 @@
 <?php
 
-// 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
-require_once 'cors.php';       // 1. Beresin CORS & preflight OPTIONS
-require_once 'auth_check.php'; // 2. Kunci pintu pake HttpOnly Cookie / Token
-include_once 'db_config.php';  // 3. Koneksi DB (sudah dipanggil juga di auth_check)
+// CORS & preflight OPTIONS
+require_once 'cors.php';       
+require_once 'auth_check.php'; 
+include_once 'db_config.php';  
 
-// 2. KUNCI UTAMA: Langsung loloskan request OPTIONS tanpa perlu cek token
+// Allow OPTIONS requests for preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0); 
 }
 
-// 3. BARU PANGGIL KONEKSI DAN SATPAM AUTH
-include 'db_config.php'; // <-- Sesuaikan dengan nama file database lo (db.php / config.php)
+// Check connection + Security Authentication
+include 'db_config.php'; 
 include 'check_auth.php';
 
 $input = file_get_contents("php://input");
@@ -27,30 +27,30 @@ if ($data && isset($data['id'])) {
     $project_url = $conn->real_escape_string($data['project_url'] ?? '');
     $video_url   = $conn->real_escape_string($data['video_url'] ?? '');
 
-    // --- LOGIC UPDATE MAPPING PER TABEL ---
+    // Logic to determine which table to update based on the category
     if ($category === 'about') {
-        // Tabel about_content: kolom teksnya adalah 'content'
+        // Columns in about_content: id, content
         $sql = "UPDATE about_content SET content='$description' WHERE id=$id";
     } 
     elseif ($category === 'about_images') {
     $sql = "UPDATE about_images SET image_url='$image_url' WHERE id=$id";
     }
     elseif ($category === 'skills') {
-        // Tabel skills: kolomnya skill_name dan description
+        // Columns in skills: id, skill_name, skill_number, description
         $sql = "UPDATE skills SET skill_name='$title', description='$description' WHERE id=$id";
     } 
     elseif ($category === 'tech_icons') {
     $sql = "UPDATE tech_icons SET name='$title', image_url='$image_url' WHERE id=$id";
     }
     elseif ($category === 'experience') {
-        // Tabel experience: kolom title dan description
+        // Columns in experience: id, title, date_range, description
         $sql = "UPDATE experience SET title='$title', date_range='$date_range', description='$description' WHERE id=$id";
     } 
     elseif ($category === 'education') {
     $sql = "UPDATE education SET title='$title', date_range='$date_range', description='$description' WHERE id=$id";
 }
     elseif ($category === 'works' || $category === 'projects') {
-        // Tabel projects: update semua aset media proyek
+        // Columns in projects: id, title, category, image_url, project_url, video_url
         $sql = "UPDATE projects SET 
                 title='$title', 
                 image_url='$image_url', 
@@ -59,7 +59,7 @@ if ($data && isset($data['id'])) {
                 WHERE id=$id";
     }
 
-    // --- EKSEKUSI QUERY ---
+    // Query execution and response
     if (isset($sql)) {
         if ($conn->query($sql)) {
             echo json_encode(["status" => "success", "message" => "Data $category Berhasil Terupdate, Zi!"]);

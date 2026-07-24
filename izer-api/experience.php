@@ -1,19 +1,12 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "izer_portofolio"; 
-
-$conn = new mysqli($host, $user, $pass, $db);
+require_once 'cors.php';
+include 'db_config.php';
 
 if ($conn->connect_error) {
     die(json_encode(["error" => "Koneksi Database Gagal"]));
 }
 
-$sql = "SELECT * FROM experience ORDER BY id ASC"; // Ambil yang terbaru dulu
+$sql = "SELECT * FROM experience ORDER BY id ASC"; 
 $result = $conn->query($sql);
 
 $exp = [];

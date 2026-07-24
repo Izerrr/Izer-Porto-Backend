@@ -1,7 +1,7 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-include 'config.php'; // Pakai file config biar rapi
+// CORS & preflight OPTIONS
+require_once 'cors.php';
+include 'db_config.php'; 
 
 $sql = "SELECT image_url FROM about_images";
 $result = $conn->query($sql);

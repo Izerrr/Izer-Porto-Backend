@@ -1,17 +1,17 @@
 <?php
-// 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
-require_once 'cors.php';       // 1. Beresin CORS & preflight OPTIONS
-require_once 'auth_check.php'; // 2. Kunci pintu pake HttpOnly Cookie / Token
-include_once 'db_config.php';  // 3. Koneksi DB (sudah dipanggil juga di auth_check)
+// CORS & preflight OPTIONS
+require_once 'cors.php';       
+require_once 'auth_check.php'; 
+include_once 'db_config.php';  
 
 
-// 2. KUNCI UTAMA: Langsung loloskan request OPTIONS tanpa perlu cek token
+// Allow OPTIONS requests for preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0); 
 }
 
-// 3. BARU PANGGIL KONEKSI DAN SATPAM AUTH
-include 'db_config.php'; // <-- Sesuaikan dengan nama file database lo (db.php / config.php)
+// Check connection + Security Authentication
+include 'db_config.php'; 
 include 'check_auth.php';
 
 $input = file_get_contents("php://input");
@@ -23,11 +23,10 @@ if ($data) {
     $desc     = $conn->real_escape_string($data['description'] ?? '');
     $date_range = $conn->real_escape_string($data['date_range'] ?? 'Present');
 
-    // --- LOGIC MAPPING PER TABEL SAKTI ---
+    // MySQL Tables Mapping based on category
     
     if ($category === 'about') {
-        // Struktur DB: id, content
-        // Karena cuma ada kolom 'content', kita masukkan variabel $desc ke sana
+        // Structure DB: id, content
         $sql = "INSERT INTO about_content (content) VALUES ('$desc')";
     } 
     elseif ($category === 'about_images') {
@@ -35,8 +34,7 @@ if ($data) {
     $sql = "INSERT INTO about_images (image_url) VALUES ('$img')";
 }
     elseif ($category === 'skills') { 
-        // Struktur DB: id, skill_name, skill_number, description
-        // Kita set default skill_number ke 80 dulu supaya jumlah kolom dan value-nya pas (3 kolom, 3 value)
+        // Structure DB: id, skill_name, skill_number, description
         $sql = "INSERT INTO skills (skill_name, skill_number, description) VALUES ('$title', 80, '$desc')";
     }
     
@@ -46,8 +44,7 @@ if ($data) {
     }
     
     elseif ($category === 'experience') {
-        // Struktur DB: id, title, date_range, description
-        // Karena dari form belum ngirim date_range, kita isi default 'Present' dulu biar gak error kosong
+        // Structure DB: id, title, date_range, description
 
         $sql = "INSERT INTO experience (title, date_range, description) VALUES ('$title', '$date_range', '$desc')";
     } 
@@ -57,7 +54,7 @@ if ($data) {
 }
 
     elseif ($category === 'works' || $category === 'projects') {
-        // Struktur DB: id, title, category, image_url, project_url, video_url
+        // Database Structure based on MySQL
         $img = $conn->real_escape_string($data['image_url'] ?? '');
         $prj = $conn->real_escape_string($data['project_url'] ?? '');
         $vid = $conn->real_escape_string($data['video_url'] ?? '');
@@ -66,12 +63,12 @@ if ($data) {
                 VALUES ('$title', '$category', '$img', '$prj', '$vid')";
     }
 
-    // --- EKSEKUSI ---
+    // Execution
     if (isset($sql)) {
         if ($conn->query($sql)) {
             echo json_encode(["status" => "success", "message" => "Data $category Berhasil Masuk!"]);
         } else {
-            // Bakal nampilin error detail dari MySQL kalau strukturnya masih gak cocok
+            // MySQL Error Handling
             echo json_encode(["status" => "error", "message" => "MySQL Error: " . $conn->error]);
         }
     } else {

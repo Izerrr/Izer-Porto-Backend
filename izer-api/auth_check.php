@@ -1,8 +1,7 @@
 <?php
-// auth_check.php
 include_once 'db_config.php';
 
-// Ambil token dari HttpOnly Cookie atau Header fallback
+// Take the token from either the cookie or the custom header
 $token = $_COOKIE['admin_token'] ?? $_SERVER['HTTP_X_ADMIN_TOKEN'] ?? null;
 
 if (!$token) {
@@ -11,7 +10,7 @@ if (!$token) {
     exit();
 }
 
-// Cek token ke database
+// Check if the token exists in the database
 $stmt = $conn->prepare("SELECT id FROM admin_users WHERE token = ?");
 $stmt->bind_param("s", $token);
 $stmt->execute();

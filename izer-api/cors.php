@@ -15,7 +15,7 @@ header("Access-Control-Allow-Headers: Content-Type, X-Admin-Token, Authorization
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
-// KUNCI: Cegah bot scanner & browser hang pas ngirim OPTIONS request
+// Block requests from disallowed origins
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit(0);

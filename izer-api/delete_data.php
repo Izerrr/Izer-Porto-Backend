@@ -1,16 +1,16 @@
 <?php
-// 1. IZINKAN HEADER KUSTOM 'X-Admin-Token' MASUK
-require_once 'cors.php';       // 1. Beresin CORS & preflight OPTIONS
-require_once 'auth_check.php'; // 2. Kunci pintu pake HttpOnly Cookie / Token
-include_once 'db_config.php';  // 3. Koneksi DB (sudah dipanggil juga di auth_check)
+// CORS & preflight OPTIONS
+require_once 'cors.php';      
+require_once 'auth_check.php'; 
+include_once 'db_config.php';  
 
-// 2. KUNCI UTAMA: Langsung loloskan request OPTIONS tanpa perlu cek token
+// Allow OPTIONS requests for preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0); 
 }
 
-// 3. BARU PANGGIL KONEKSI DAN SATPAM AUTH
-include 'db_config.php'; // <-- Sesuaikan dengan nama file database lo (db.php / config.php)
+// Seek connection + Security Authentication
+include 'db_config.php'; 
 include 'check_auth.php';
 
 $input = file_get_contents("php://input");
@@ -20,7 +20,7 @@ if ($data && isset($data['id'])) {
     $id = (int)$data['id'];
     $category = $data['category'] ?? 'works'; 
 
-    // --- Mapping Tabel Lengkap ---
+    // Table mapping based on category
     $table = "";
     if ($category === 'about') $table = "about_content";
     elseif ($category === 'about_images') $table = "about_images";
