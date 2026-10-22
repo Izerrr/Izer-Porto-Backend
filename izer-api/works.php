@@ -3,7 +3,7 @@
 require_once 'cors.php';       
 include 'db_config.php';
 
-$result = $conn->query("SELECT * FROM projects ORDER BY id ASC");
+$result = $conn->query("SELECT * FROM projects ORDER BY order_index ASC, id ASC");
 $data = [];
 while($row = $result->fetch_assoc()) { $data[] = $row; }
 echo json_encode($data);

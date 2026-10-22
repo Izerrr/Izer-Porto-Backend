@@ -2,7 +2,8 @@
 
 $allowed_origins = [
     "http://localhost:3000",
-    "https://izerworks.my.id" 
+    "https://izerworks.my.id",
+    "https://www.izerworks.my.id"
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

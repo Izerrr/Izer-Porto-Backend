@@ -15,13 +15,14 @@ if (!$data) {
 }
 
 // Input Extraction & Sanitization
-$category   = trim($data['category'] ?? '');
-$title      = strip_tags(trim($data['title'] ?? ''));
-$desc       = strip_tags(trim($data['description'] ?? ''));
-$date_range = strip_tags(trim($data['date_range'] ?? 'Present'));
-$img_url    = trim($data['image_url'] ?? '');
-$proj_url   = trim($data['project_url'] ?? '');
-$video_url  = trim($data['video_url'] ?? '');
+$category    = trim($data['category'] ?? '');
+$project_cat = strip_tags(trim($data['project_category'] ?? 'Web Development'));
+$title       = strip_tags(trim($data['title'] ?? ''));
+$desc        = strip_tags(trim($data['description'] ?? ''));
+$date_range  = strip_tags(trim($data['date_range'] ?? 'Present'));
+$img_url     = trim($data['image_url'] ?? '');
+$proj_url    = trim($data['project_url'] ?? '');
+$video_url   = trim($data['video_url'] ?? '');
 
 $stmt = null;
 
@@ -52,13 +53,30 @@ elseif ($category === 'education') {
     $stmt->bind_param("sss", $title, $date_range, $desc);
 } 
 elseif ($category === 'works' || $category === 'projects') {
+    if ($project_cat === '' || strtolower($project_cat) === 'works') {
+        $project_cat = 'Web Development';
+    }
     $stmt = $conn->prepare("INSERT INTO projects (title, category, image_url, project_url, video_url) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $title, $category, $img_url, $proj_url, $video_url);
+    $stmt->bind_param("sssss", $title, $project_cat, $img_url, $proj_url, $video_url);
 }
 
 // Execution and Response Handling
 if ($stmt) {
     if ($stmt->execute()) {
+        $new_id = (int)$conn->insert_id;
+        $tableMap = [
+            'about_images' => 'about_images',
+            'experience'   => 'experience',
+            'education'    => 'education',
+            'skills'       => 'skills',
+            'tech_icons'   => 'tech_icons',
+            'works'        => 'projects',
+            'projects'     => 'projects',
+        ];
+        if (isset($tableMap[$category]) && $new_id > 0) {
+            $tbl = $tableMap[$category];
+            $conn->query("UPDATE {$tbl} SET order_index = {$new_id} WHERE id = {$new_id}");
+        }
         echo json_encode(["status" => "success", "message" => "Data for category '{$category}' created successfully!"]);
     } else {
         http_response_code(500);

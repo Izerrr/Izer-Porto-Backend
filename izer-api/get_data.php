@@ -14,30 +14,27 @@ if ($category === 'about') {
     $sql = "SELECT id, CONCAT('About Content #', id) AS title, content AS description FROM about_content ORDER BY id DESC";
 } 
 elseif ($category === 'about_images') {
-    $sql = "SELECT id, image_url FROM about_images ORDER BY id DESC";
+    $sql = "SELECT id, image_url FROM about_images ORDER BY order_index ASC, id ASC";
 }
 elseif ($category === 'experience') {
     // Structure: id, title, date_range, description
     // Retrieve all fields; Frontend will consume 'title' and 'description'.
-    $sql = "SELECT id, title, date_range, description FROM experience ORDER BY id DESC";
+    $sql = "SELECT id, title, date_range, description FROM experience ORDER BY order_index ASC, id ASC";
 } 
 elseif ($category === 'education') {
-    $sql = "SELECT id, title, date_range, description FROM education ORDER BY id DESC";
+    $sql = "SELECT id, title, date_range, description FROM education ORDER BY order_index ASC, id ASC";
 }
 elseif ($category === 'skills') {
-    // Structure: id, skill_name, skill_number, description
-    // Alias 'skill_name' to 'title' for frontend consistency.
-    // Fetch 'description' directly as the column already exists in the table.
-    $sql = "SELECT id, skill_name AS title, skill_number, description FROM skills ORDER BY skill_number ASC";
+    // Structure: id, skill_name AS title, skill_number, description
+    $sql = "SELECT id, skill_name AS title, skill_number, description FROM skills ORDER BY order_index ASC, id ASC";
 } 
 elseif ($category === 'tech_icons') {
     // Alias 'name' to 'title' to synchronize with the Next.js Admin sidebar list
-    $sql = "SELECT id, name AS title, image_url FROM tech_icons ORDER BY id ASC";
+    $sql = "SELECT id, name AS title, image_url FROM tech_icons ORDER BY order_index ASC, id ASC";
 }
 elseif ($category === 'works') {
     // Structure: id, title, category, image_url, project_url, video_url
-    // Explicit selection of required columns for query safety and performance.
-    $sql = "SELECT id, title, category, image_url, project_url, video_url FROM projects ORDER BY id DESC";
+    $sql = "SELECT id, title, category, image_url, project_url, video_url FROM projects ORDER BY order_index ASC, id ASC";
 }
 
 // Execute the query and fetch results

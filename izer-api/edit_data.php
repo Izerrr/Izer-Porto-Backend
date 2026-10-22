@@ -17,13 +17,14 @@ if (!$data || !$id) {
 }
 
 // Input Extraction & Sanitization
-$category   = trim($data['category'] ?? '');
-$title      = strip_tags(trim($data['title'] ?? ''));
-$desc       = strip_tags(trim($data['description'] ?? ''));
-$date_range = strip_tags(trim($data['date_range'] ?? 'Present'));
-$img_url    = trim($data['image_url'] ?? '');
-$proj_url   = trim($data['project_url'] ?? '');
-$video_url  = trim($data['video_url'] ?? '');
+$category    = trim($data['category'] ?? '');
+$project_cat = strip_tags(trim($data['project_category'] ?? 'Web Development'));
+$title       = strip_tags(trim($data['title'] ?? ''));
+$desc        = strip_tags(trim($data['description'] ?? ''));
+$date_range  = strip_tags(trim($data['date_range'] ?? 'Present'));
+$img_url     = trim($data['image_url'] ?? '');
+$proj_url    = trim($data['project_url'] ?? '');
+$video_url   = trim($data['video_url'] ?? '');
 
 $stmt = null;
 
@@ -53,14 +54,17 @@ elseif ($category === 'education') {
     $stmt->bind_param("sssi", $title, $date_range, $desc, $id);
 } 
 elseif ($category === 'works' || $category === 'projects') {
-    $stmt = $conn->prepare("UPDATE projects SET title = ?, image_url = ?, project_url = ?, video_url = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $title, $img_url, $proj_url, $video_url, $id);
+    if ($project_cat === '' || strtolower($project_cat) === 'works') {
+        $project_cat = 'Web Development';
+    }
+    $stmt = $conn->prepare("UPDATE projects SET title = ?, category = ?, image_url = ?, project_url = ?, video_url = ? WHERE id = ?");
+    $stmt->bind_param("sssssi", $title, $project_cat, $img_url, $proj_url, $video_url, $id);
 }
 
 // Execution and Response Handling
 if ($stmt) {
     if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "Data for category '{$category}' updated successfully!"]);
+        echo json_encode(["status" => "success", "message" => "Data ID #{$id} updated successfully!"]);
     } else {
         http_response_code(500);
         echo json_encode(["status" => "error", "message" => "Database execution failed: " . $stmt->error]);
