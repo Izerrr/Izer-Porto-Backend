@@ -2,6 +2,12 @@
 require_once 'cors.php';
 include_once 'db_config.php';
 
+if (!isset($conn) || !$conn || $conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["status" => "error", "message" => "Database connection unavailable"]);
+    exit;
+}
+
 $category = $_GET['category'] ?? 'works';
 
 // Table mapping based on category

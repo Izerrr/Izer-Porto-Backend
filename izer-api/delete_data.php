@@ -4,11 +4,6 @@ require_once 'cors.php';
 require_once 'auth_check.php'; 
 include_once 'db_config.php';  
 
-// Allow OPTIONS requests for preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0); 
-}
-
 $input = file_get_contents("php://input");
 $data = json_decode($input, true);
 
@@ -27,17 +22,26 @@ if ($data && isset($data['id'])) {
     elseif ($category === 'works' || $category === 'projects') $table = "projects";
 
     if ($table !== "") {
-        $sql = "DELETE FROM $table WHERE id=$id";
-
-        if ($conn->query($sql)) {
-            echo json_encode(["status" => "success", "message" => "Beres Zi, data dari tabel $table lenyap!"]);
+        $stmt = $conn->prepare("DELETE FROM {$table} WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                echo json_encode(["status" => "success", "message" => "Data dari tabel {$table} berhasil dihapus!"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["status" => "error", "message" => "MySQL Error: " . $stmt->error]);
+            }
+            $stmt->close();
         } else {
-            echo json_encode(["status" => "error", "message" => "MySQL Error: " . $conn->error]);
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => "Prepare failed: " . $conn->error]);
         }
     } else {
-        echo json_encode(["status" => "error", "message" => "Kategori Gak Dikenal: $category"]);
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Kategori tidak dikenal: {$category}"]);
     }
 } else {
-    echo json_encode(["status" => "error", "message" => "ID Tidak Ditemukan"]);
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "ID tidak ditemukan"]);
 }
 ?>
